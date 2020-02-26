@@ -1,0 +1,23 @@
+server:
+  port: ${PORT:8080}
+
+spring:
+  application:
+    name: wwi
+  datasource:
+    url: jdbc:sqlserver://localhost:1433;databaseName=WideWorldImporters
+    username: sa
+    password: Winter2020!
+  jpa:
+    hibernate:
+      ddl-auto: none
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    database: sql_server
+
+logging:
+  level:
+    root: INFO
+    org.mihaimadan.wwi: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
