@@ -1,7 +1,10 @@
 package org.mihaimadan.wwi.warehouse.controller;
 
+import org.mihaimadan.wwi.warehouse.model.StockGroup;
 import org.mihaimadan.wwi.warehouse.model.StockItem;
+import org.mihaimadan.wwi.warehouse.model.dto.StockGroupDTO;
 import org.mihaimadan.wwi.warehouse.model.dto.StockItemClientRespDTO;
+import org.mihaimadan.wwi.warehouse.repository.StockGroupRepository;
 import org.mihaimadan.wwi.warehouse.repository.StockItemRepository;
 import org.mihaimadan.wwi.warehouse.service.StockItemService;
 import org.springframework.beans.BeanUtils;
@@ -15,11 +18,14 @@ import java.util.List;
 @RequestMapping("/warehouse")
 public class WarehouseController {
     private final StockItemRepository stockItemRepository;
+    private final StockGroupRepository stockGroupRepository;
     private final StockItemService stockItemService;
 
-    public WarehouseController(StockItemService stockItemService, StockItemRepository stockItemRepository) {
+    public WarehouseController(StockItemService stockItemService, StockItemRepository stockItemRepository,
+                 StockGroupRepository stockGroupRepository) {
         this.stockItemService = stockItemService;
         this.stockItemRepository = stockItemRepository;
+        this.stockGroupRepository = stockGroupRepository;
     }
 
     @GetMapping("/")
@@ -27,10 +33,14 @@ public class WarehouseController {
         return stockItemService.getFirstStockItems();
     }
 
+    @GetMapping("/stock/groups")
+    public List<StockGroupDTO> findAllStockGroups() {return stockItemService.findAllStockGroups();}
+
     @GetMapping("/{id}")
-    public StockItem getStockItem(@PathVariable Long id) {
-        return stockItemRepository.findById(id)
+    public StockGroup getStockItem(@PathVariable Long id) {
+        return stockGroupRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "not found by given id"));
+
     }
 
     @PutMapping("/{id}")
