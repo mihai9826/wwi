@@ -8,6 +8,7 @@ import org.mihaimadan.wwi.warehouse.repository.StockGroupRepository;
 import org.mihaimadan.wwi.warehouse.repository.StockItemRepository;
 import org.mihaimadan.wwi.warehouse.service.StockItemService;
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -33,8 +34,18 @@ public class WarehouseController {
         return stockItemService.getFirstStockItems();
     }
 
+    @GetMapping("/items")
+    public Page<StockItemClientRespDTO> findAllItemsPaginated(@RequestParam int page, @RequestParam int size) {
+        return stockItemService.findAllItemsPaginated(page, size);
+    }
+
     @GetMapping("/stock/groups")
     public List<StockGroupDTO> findAllStockGroups() {return stockItemService.findAllStockGroups();}
+
+    @GetMapping("/stock/groups/{id}/items")
+    public Page<StockItemClientRespDTO> findItemsOfStockGroup(@PathVariable Long id, @RequestParam int page, @RequestParam int size) {
+        return stockItemService.findItemsOfStockGroup(id, page, size);
+    }
 
     @GetMapping("/{id}")
     public StockGroup getStockItem(@PathVariable Long id) {

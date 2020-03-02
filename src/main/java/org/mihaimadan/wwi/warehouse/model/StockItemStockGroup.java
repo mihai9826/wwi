@@ -12,7 +12,7 @@ import javax.persistence.*;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class StockItemStockGroups {
+public class StockItemStockGroup {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long stockItemStockGroupId;

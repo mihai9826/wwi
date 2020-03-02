@@ -23,5 +23,5 @@ public class StockGroup {
     private String stockGroupName;
 
     @OneToMany(mappedBy = "stockGroup", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<StockItemStockGroups> stockItems = new ArrayList<>();
+    private List<StockItemStockGroup> stockItems = new ArrayList<>();
 }

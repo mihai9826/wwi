@@ -49,6 +49,6 @@ public class StockItem {
 
     @JsonIgnore
     @OneToMany(mappedBy = "stockItem")
-    private List<StockItemStockGroups> stockGroups = new ArrayList<>();
+    private List<StockItemStockGroup> stockGroups = new ArrayList<>();
 
 }
