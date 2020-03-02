@@ -1,11 +1,14 @@
 package org.mihaimadan.wwi.warehouse.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "StockItems", schema = "Warehouse")
@@ -43,5 +46,9 @@ public class StockItem {
 
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "stockItem", orphanRemoval = true)
     private StockItemHoldings stockItemHoldings;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "stockItem")
+    private List<StockItemStockGroup> stockGroups = new ArrayList<>();
 
 }
