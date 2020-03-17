@@ -1,5 +1,6 @@
 package org.mihaimadan.wwi.configuration;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -11,9 +12,11 @@ import org.springframework.security.web.firewall.HttpFirewall;
 import org.springframework.security.web.firewall.StrictHttpFirewall;
 
 
-
 @Configuration
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
+
+    @Value("${app.url}")
+    private String appUrl;
 
     private final CustomUserDetailsService customUserDetailsService;
 
@@ -27,10 +30,12 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .csrf().disable()
             .cors().disable()
             .authorizeRequests()
-                .antMatchers("/**")
+                .anyRequest()
                     .permitAll()
             .and()
-                .formLogin();
+                .formLogin()
+                .and()
+                    .logout().logoutSuccessUrl(appUrl + "/auth/login").permitAll();
     }
 
     @Override

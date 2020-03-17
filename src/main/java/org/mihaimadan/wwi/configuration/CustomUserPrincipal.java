@@ -1,6 +1,8 @@
 package org.mihaimadan.wwi.configuration;
 
 import org.mihaimadan.wwi.users.model.User;
+import org.mihaimadan.wwi.users.model.UserDTO;
+import org.springframework.beans.BeanUtils;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -12,8 +14,16 @@ public class CustomUserPrincipal implements UserDetails {
 
     private User theUser;
 
+    private UserDTO userDTO;
+
     public CustomUserPrincipal(User theUser) {
         this.theUser = theUser;
+        this.userDTO = new UserDTO();
+        BeanUtils.copyProperties(this.theUser, userDTO);
+    }
+
+    public UserDTO getUserDTO() {
+        return userDTO;
     }
 
     @Override

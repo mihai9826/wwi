@@ -1,8 +1,10 @@
 package org.mihaimadan.wwi.users.model;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 public class UserDTO {
 
     private Long personId;
@@ -11,9 +13,9 @@ public class UserDTO {
 
     private String emailAddress;
 
-    private String phoneNumber;
-
     private String password;
+
+    private String phoneNumber;
 
     private String role;
 }
