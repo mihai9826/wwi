@@ -24,6 +24,8 @@ public class User {
     @NotNull
     private String emailAddress;
 
+    private String deliveryAddress;
+
     @NotNull
     private String phoneNumber;
 

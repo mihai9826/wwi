@@ -12,18 +12,15 @@ import java.util.List;
 
 public class CustomUserPrincipal implements UserDetails {
 
-    private User theUser;
-
-    private UserDTO userDTO;
+    private UserDTO theUser;
 
     public CustomUserPrincipal(User theUser) {
-        this.theUser = theUser;
-        this.userDTO = new UserDTO();
-        BeanUtils.copyProperties(this.theUser, userDTO);
+        this.theUser = new UserDTO();
+        BeanUtils.copyProperties(theUser, this.theUser);
     }
 
-    public UserDTO getUserDTO() {
-        return userDTO;
+    public UserDTO getTheUser() {
+        return theUser;
     }
 
     @Override
