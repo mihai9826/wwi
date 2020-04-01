@@ -1,9 +1,7 @@
 package org.mihaimadan.wwi.orders.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.mihaimadan.wwi.warehouse.model.StockItem;
 
 import javax.persistence.*;
@@ -11,13 +9,15 @@ import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "OrderLines", schema = "Sales")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderLine {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @SequenceGenerator(name = "idGenerator", sequenceName = "Sequences.OrderLineID", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.AUTO, generator = "idGenerator")
     private Long orderLineId;
 
     @OneToOne
@@ -34,5 +34,6 @@ public class OrderLine {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "OrderID")
     private Order theOrder;
+
 
 }

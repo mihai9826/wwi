@@ -1,5 +1,6 @@
 package org.mihaimadan.wwi.orders.model;
 
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,7 +20,8 @@ import java.util.List;
 public class Order {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @SequenceGenerator(name = "idGeneratorSeq", sequenceName = "Sequences.OrderID", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.AUTO, generator = "idGeneratorSeq")
     private Long orderId;
 
     @OneToOne
@@ -43,5 +45,10 @@ public class Order {
     @PrePersist
     public void prePersist() {
         orderDate = LocalDateTime.now();
+    }
+
+    public void addOrderLine(OrderLine orderLine) {
+        orderLine.setTheOrder(this);
+        orderLines.add(orderLine);
     }
 }
