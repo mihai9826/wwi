@@ -34,6 +34,9 @@ public class Order {
     @NotNull
     private double orderValue;
 
+    @NotNull
+    private String status;
+
     private String comments;
 
     @NotNull
@@ -45,6 +48,7 @@ public class Order {
     @PrePersist
     public void prePersist() {
         orderDate = LocalDateTime.now();
+        status = StatusEnum.PENDING.getValue();
     }
 
     public void addOrderLine(OrderLine orderLine) {
