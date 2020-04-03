@@ -8,6 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
+
 @RestController
 public class OrdersController {
 
@@ -23,6 +25,11 @@ public class OrdersController {
     public Order getOrderById(@PathVariable Long id) {
         return orderRepository.findById(id)
            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,  "not found by given id"));
+    }
+
+    @GetMapping("/client/{id}/orders")
+    public List<Order> getClientOrders(@PathVariable Long id) {
+        return orderService.getClientOrders(id);
     }
 
     @PostMapping("/client/orders")
