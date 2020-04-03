@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 
@@ -45,9 +47,36 @@ public class OrderService {
         orderRepository.save(newOrder);//80000 last id
     }
 
+    public List<Order> getPendingAndProcessingOrders(String date, String status) {
+        if (date != null && status != null) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+            LocalDateTime parsedDate = LocalDateTime.parse(date, formatter);
+            return orderRepository.findAllByStatusAndOrderDateAfterOrderByOrderDateDesc(status, parsedDate);
+        }
+        if (date != null) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+            LocalDateTime parsedDate = LocalDateTime.parse(date, formatter);
+            return orderRepository.findAllByOrderDateAfterOrderByOrderDateDesc(parsedDate);
+        }
+        if (status != null) {
+            return orderRepository.findAllByStatusOrderByOrderDateDesc(status);
+        }
+
+        return orderRepository
+                .findAllByStatusNotOrderByOrderDateDesc("DISPATCHED");
+    }
+
+    public Order getPendingAndProcessingOrdersOfId(Long id) {
+        return orderRepository
+                .findAllByStatusNotOrderByOrderDateDesc("DISPATCHED").stream()
+                .filter(it -> it.getOrderId().equals(id))
+                .findAny()
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No order found with given id"));
+    }
+
     public List<Order> getClientOrders(Long id) {
         User client = userService.getById(id);
-        return orderRepository.findAllByContactPersonOrderByOrderIdDesc(client)
+        return orderRepository.findAllByContactPersonOrderByOrderDateDesc(client)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Client doesn't have orders"));
     }
 }

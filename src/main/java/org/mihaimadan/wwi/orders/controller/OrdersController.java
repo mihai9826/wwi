@@ -24,7 +24,18 @@ public class OrdersController {
     @GetMapping("/orders/{id}")
     public Order getOrderById(@PathVariable Long id) {
         return orderRepository.findById(id)
-           .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,  "not found by given id"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "not found by given id"));
+    }
+
+    @GetMapping("/admin/orders")
+    public List<Order> getPendingAndProcessingOrders(@RequestParam(required = false) String date,
+                                                     @RequestParam(required = false) String status) {
+        return orderService.getPendingAndProcessingOrders(date, status);
+    }
+
+    @GetMapping("/admin/orders/{id}/pending-processing")
+    public Order getPendingAndProcessingOrdersOfId(@PathVariable Long id) {
+        return orderService.getPendingAndProcessingOrdersOfId(id);
     }
 
     @GetMapping("/client/{id}/orders")
