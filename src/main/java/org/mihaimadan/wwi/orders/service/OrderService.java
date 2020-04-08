@@ -8,6 +8,8 @@ import org.mihaimadan.wwi.users.model.User;
 import org.mihaimadan.wwi.users.service.UserService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -78,5 +80,15 @@ public class OrderService {
         User client = userService.getById(id);
         return orderRepository.findAllByContactPersonOrderByOrderDateDesc(client)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Client doesn't have orders"));
+    }
+
+    public Page<Order> findDispatchedOrdersPaginate(int page, int size) {
+        return orderRepository.findAllByStatusOrderByOrderDateDesc("DISPATCHED", PageRequest.of(page, size));
+    }
+
+    public Order getDispatchedOrderOfId(Long id) {
+        return orderRepository.findByStatusAndOrderId("DISPATCHED", id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Dispatched order with" +
+                        " given id not found"));
     }
 }
