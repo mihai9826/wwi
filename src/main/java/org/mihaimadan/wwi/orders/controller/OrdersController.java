@@ -4,6 +4,7 @@ import org.mihaimadan.wwi.orders.model.Order;
 import org.mihaimadan.wwi.orders.model.dto.OrderRequestDTO;
 import org.mihaimadan.wwi.orders.repository.OrderRepository;
 import org.mihaimadan.wwi.orders.service.OrderService;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -49,6 +50,21 @@ public class OrdersController {
         return orderService.getDispatchedOrderOfId(id);
     }
 
+    @PutMapping("/admin/orders/{id}/pending")
+    public Order changeOrderStatusToPending(@PathVariable Long id) {
+        return orderService.changeOrderStatus(id, "PENDING");
+    }
+
+    @PutMapping("/admin/orders/{id}/processing")
+    public Order changeOrderStatusToProcessing(@PathVariable Long id) {
+        return orderService.changeOrderStatus(id, "PROCESSING");
+    }
+
+    @PutMapping("/admin/orders/{id}/dispatched")
+    public Order changeOrderStatusToDispatched(@PathVariable Long id) {
+        return orderService.changeOrderStatus(id, "DISPATCHED");
+    }
+
     @GetMapping("/client/{id}/orders")
     public List<Order> getClientOrders(@PathVariable Long id) {
         return orderService.getClientOrders(id);
@@ -58,4 +74,5 @@ public class OrdersController {
     public void createNewOrder(@RequestBody OrderRequestDTO orderRequest) {
         orderService.createNewOrder(orderRequest);
     }
+
 }
