@@ -37,7 +37,7 @@ public class UserController {
     }
 
     @PostMapping("/users")
-    public void createUser(@RequestBody CreateUserRequest createUserReq) { userService.createUser(createUserReq); }
+    public void registerUser(@RequestBody CreateUserRequest createUserReq) { userService.registerUser(createUserReq); }
 
     @PutMapping("/users/{userId}")
     public UserDTO updateUser(@RequestBody UserDTO userDTO, @PathVariable Long userId) {

@@ -25,7 +25,10 @@ public class UserService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "no user found with given id"));
     }
 
-    public void createUser(CreateUserRequest createUserReq) {
+    public void registerUser(CreateUserRequest createUserReq) {
+        if (userRepository.existsByEmailAddress(createUserReq.getEmailAddress())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "User with this email already exists");
+        }
         User newUser = new User();
         BeanUtils.copyProperties(createUserReq, newUser);
 
