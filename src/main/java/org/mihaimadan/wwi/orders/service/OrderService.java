@@ -54,6 +54,11 @@ public class OrderService {
         orderRepository.save(newOrder);//80000 last id
     }
 
+    public Order getOrderByIdForAdmin(Long id) {
+        return orderRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "not found by given id"));
+    }
+
     public List<Order> getPendingAndProcessingOrders(String date, String status) {
         if (date != null && status != null) {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");

@@ -23,10 +23,9 @@ public class OrdersController {
         this.orderService = orderService;
     }
 
-    @GetMapping("/orders/{id}")
-    public Order getOrderById(@PathVariable Long id) {
-        return orderRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "not found by given id"));
+    @GetMapping("/admin/orders/{id}")
+    public Order getOrderByIdForAdmin(@PathVariable Long id) {
+        return orderService.getOrderByIdForAdmin(id);
     }
 
     @GetMapping("/admin/orders/pending-processing")
@@ -63,6 +62,12 @@ public class OrdersController {
     @PutMapping("/admin/orders/{id}/dispatched")
     public Order changeOrderStatusToDispatched(@PathVariable Long id) {
         return orderService.changeOrderStatus(id, "DISPATCHED");
+    }
+
+    @GetMapping("/client/orders/{id}")
+    public Order getOrderById(@PathVariable Long id) {
+        return orderRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "not found by given id"));
     }
 
     @GetMapping("/client/{id}/orders")
