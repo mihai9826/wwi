@@ -1,7 +1,7 @@
 package org.mihaimadan.wwi.configuration;
 
 import org.mihaimadan.wwi.users.model.User;
-import org.mihaimadan.wwi.users.model.UserDTO;
+import org.mihaimadan.wwi.users.model.dto.UserDTO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

@@ -4,6 +4,8 @@ import org.mihaimadan.wwi.orders.model.Order;
 import org.mihaimadan.wwi.orders.model.dto.OrderRequestDTO;
 import org.mihaimadan.wwi.orders.repository.OrderRepository;
 import org.mihaimadan.wwi.orders.service.OrderService;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -21,10 +23,51 @@ public class OrdersController {
         this.orderService = orderService;
     }
 
-    @GetMapping("/orders/{id}")
+    @GetMapping("/admin/orders/{id}")
+    public Order getOrderByIdForAdmin(@PathVariable Long id) {
+        return orderService.getOrderByIdForAdmin(id);
+    }
+
+    @GetMapping("/admin/orders/pending-processing")
+    public List<Order> getPendingAndProcessingOrders(@RequestParam(required = false) String date,
+                                                     @RequestParam(required = false) String status) {
+        return orderService.getPendingAndProcessingOrders(date, status);
+    }
+
+    @GetMapping("/admin/orders/{id}/pending-processing")
+    public Order getPendingAndProcessingOrdersOfId(@PathVariable Long id) {
+        return orderService.getPendingAndProcessingOrdersOfId(id);
+    }
+
+    @GetMapping("/admin/orders/dispatched")
+    public Page<Order> findPaginateDispatchedOrders(@RequestParam int page, @RequestParam int size) {
+        return orderService.findDispatchedOrdersPaginate(page, size);
+    }
+
+    @GetMapping("/admin/orders/{id}/dispatched")
+    public Order getDispatchedOrderOfId(@PathVariable Long id) {
+        return orderService.getDispatchedOrderOfId(id);
+    }
+
+    @PutMapping("/admin/orders/{id}/pending")
+    public Order changeOrderStatusToPending(@PathVariable Long id) {
+        return orderService.changeOrderStatus(id, "PENDING");
+    }
+
+    @PutMapping("/admin/orders/{id}/processing")
+    public Order changeOrderStatusToProcessing(@PathVariable Long id) {
+        return orderService.changeOrderStatus(id, "PROCESSING");
+    }
+
+    @PutMapping("/admin/orders/{id}/dispatched")
+    public Order changeOrderStatusToDispatched(@PathVariable Long id) {
+        return orderService.changeOrderStatus(id, "DISPATCHED");
+    }
+
+    @GetMapping("/client/orders/{id}")
     public Order getOrderById(@PathVariable Long id) {
         return orderRepository.findById(id)
-           .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,  "not found by given id"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "not found by given id"));
     }
 
     @GetMapping("/client/{id}/orders")
@@ -36,4 +79,5 @@ public class OrdersController {
     public void createNewOrder(@RequestBody OrderRequestDTO orderRequest) {
         orderService.createNewOrder(orderRequest);
     }
+
 }

@@ -1,8 +1,10 @@
 package org.mihaimadan.wwi.users.controller;
 
-import org.mihaimadan.wwi.users.model.CreateUserRequest;
+import org.mihaimadan.wwi.users.model.dto.CreateUserRequest;
 import org.mihaimadan.wwi.users.model.User;
-import org.mihaimadan.wwi.users.model.UserDTO;
+import org.mihaimadan.wwi.users.model.dto.PasswordTokenConfirmationRequest;
+import org.mihaimadan.wwi.users.model.dto.PasswordTokenInitializationRequest;
+import org.mihaimadan.wwi.users.model.dto.UserDTO;
 import org.mihaimadan.wwi.users.repository.UserRepository;
 import org.mihaimadan.wwi.users.service.UserService;
 import org.springframework.beans.BeanUtils;
@@ -25,6 +27,17 @@ public class UserController {
         this.passwordEncoder = passwordEncoder;
     }
 
+    @PostMapping("/password-token")
+    public void initiatePasswordReset(@RequestBody PasswordTokenInitializationRequest passwordTokenReq) {
+        userService.createForgotPasswordToken(passwordTokenReq.getEmail());
+    }
+
+    @PutMapping("/password")
+    public void confirmPasswordReset(@RequestParam String token,
+                                     @RequestBody PasswordTokenConfirmationRequest passwordTokenConfirmationRequest) {
+        userService.updateUserPassword(token, passwordTokenConfirmationRequest.getPassword());
+    }
+
 
     @GetMapping("/users")
     public UserDTO findUserByEmail(@RequestParam String email) {
@@ -37,7 +50,7 @@ public class UserController {
     }
 
     @PostMapping("/users")
-    public void createUser(@RequestBody CreateUserRequest createUserReq) { userService.createUser(createUserReq); }
+    public void registerUser(@RequestBody CreateUserRequest createUserReq) { userService.registerUser(createUserReq); }
 
     @PutMapping("/users/{userId}")
     public UserDTO updateUser(@RequestBody UserDTO userDTO, @PathVariable Long userId) {
