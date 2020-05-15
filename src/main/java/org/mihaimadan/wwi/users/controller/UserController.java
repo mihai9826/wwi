@@ -1,8 +1,10 @@
 package org.mihaimadan.wwi.users.controller;
 
-import org.mihaimadan.wwi.users.model.CreateUserRequest;
+import org.mihaimadan.wwi.users.model.dto.CreateUserRequest;
 import org.mihaimadan.wwi.users.model.User;
-import org.mihaimadan.wwi.users.model.UserDTO;
+import org.mihaimadan.wwi.users.model.dto.PasswordTokenConfirmationRequest;
+import org.mihaimadan.wwi.users.model.dto.PasswordTokenInitializationRequest;
+import org.mihaimadan.wwi.users.model.dto.UserDTO;
 import org.mihaimadan.wwi.users.repository.UserRepository;
 import org.mihaimadan.wwi.users.service.UserService;
 import org.springframework.beans.BeanUtils;
@@ -23,6 +25,17 @@ public class UserController {
         this.userRepository = userRepository;
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
+    }
+
+    @PostMapping("/password-token")
+    public void initiatePasswordReset(@RequestBody PasswordTokenInitializationRequest passwordTokenReq) {
+        userService.createForgotPasswordToken(passwordTokenReq.getEmail());
+    }
+
+    @PutMapping("/password")
+    public void confirmPasswordReset(@RequestParam String token,
+                                     @RequestBody PasswordTokenConfirmationRequest passwordTokenConfirmationRequest) {
+        userService.updateUserPassword(token, passwordTokenConfirmationRequest.getPassword());
     }
 
 

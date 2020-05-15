@@ -1,7 +1,7 @@
 package org.mihaimadan.wwi.warehouse.controller;
 
-import org.mihaimadan.wwi.warehouse.model.StockGroup;
 import org.mihaimadan.wwi.warehouse.model.StockItem;
+import org.mihaimadan.wwi.warehouse.model.dto.AdminStockItemDTO;
 import org.mihaimadan.wwi.warehouse.model.dto.StockGroupDTO;
 import org.mihaimadan.wwi.warehouse.model.dto.StockItemClientRespDTO;
 import org.mihaimadan.wwi.warehouse.repository.StockGroupRepository;
@@ -35,23 +35,31 @@ public class WarehouseController {
     }
 
     @GetMapping("/items")
-    public Page<StockItemClientRespDTO> findAllItemsPaginated(@RequestParam int page, @RequestParam int size) {
-        return stockItemService.findAllItemsPaginated(page, size);
+    public Page<StockItemClientRespDTO> findAllItemsPaginated(@RequestParam(required = false) String sortPrice,
+                                                              @RequestParam int page,
+                                                              @RequestParam int size) {
+        return stockItemService.findAllItemsPaginated(sortPrice, page, size);
     }
 
     @GetMapping("/stock/groups")
     public List<StockGroupDTO> findAllStockGroups() {return stockItemService.findAllStockGroups();}
 
     @GetMapping("/stock/groups/{id}/items")
-    public Page<StockItemClientRespDTO> findItemsOfStockGroup(@PathVariable Long id, @RequestParam int page, @RequestParam int size) {
-        return stockItemService.findItemsOfStockGroup(id, page, size);
+    public Page<StockItemClientRespDTO> findItemsOfStockGroup(@PathVariable Long id,
+                                                              @RequestParam(required = false) String sortPrice,
+                                                              @RequestParam int page, @RequestParam int size) {
+        return stockItemService.findItemsOfStockGroup(id, sortPrice, page, size);
     }
 
-    @GetMapping("/{id}")
-    public StockGroup getStockItem(@PathVariable Long id) {
-        return stockGroupRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "not found by given id"));
+    @GetMapping("/admin/stock/item/{id}")
+    public AdminStockItemDTO getStockItemForAdmin(@PathVariable Long id) {
+        return stockItemService.getStockItemForAdmin(id);
+    }
 
+    @PutMapping("/admin/stock/item/{id}")
+    public AdminStockItemDTO updateProduct(@PathVariable Long id,
+                                           @RequestBody AdminStockItemDTO editedProduct) {
+        return stockItemService.updateProduct(id, editedProduct);
     }
 
     @PutMapping("/{id}")

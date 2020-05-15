@@ -1,4 +1,4 @@
-package org.mihaimadan.wwi.users.model;
+package org.mihaimadan.wwi.users.model.dto;
 
 import lombok.Data;
 
