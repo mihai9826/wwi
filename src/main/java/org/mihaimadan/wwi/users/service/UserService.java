@@ -3,6 +3,7 @@ package org.mihaimadan.wwi.users.service;
 import org.mihaimadan.wwi.users.model.PasswordToken;
 import org.mihaimadan.wwi.users.model.dto.CreateUserRequest;
 import org.mihaimadan.wwi.users.model.User;
+import org.mihaimadan.wwi.users.model.dto.EditUserRequest;
 import org.mihaimadan.wwi.users.repository.PasswordTokenRepository;
 import org.mihaimadan.wwi.users.repository.UserRepository;
 import org.mihaimadan.wwi.users.service.event.PasswordResetCompleteEvent;
@@ -49,6 +50,18 @@ public class UserService {
         newUser.setPassword(encodedPassword);
 
         userRepository.save(newUser);
+    }
+
+    public void editUserData(Long id, EditUserRequest editUserRequest) {
+        User userToBeUpdated = userRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "user with given id not found"));
+
+        BeanUtils.copyProperties(editUserRequest, userToBeUpdated, "password");
+
+        String newPassword = editUserRequest.getPassword();
+        userToBeUpdated.setPassword(passwordEncoder.encode(newPassword));
+
+        userRepository.save(userToBeUpdated);
     }
 
     public void createForgotPasswordToken(String email) {
