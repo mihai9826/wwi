@@ -1,10 +1,7 @@
 package org.mihaimadan.wwi.users.controller;
 
-import org.mihaimadan.wwi.users.model.dto.CreateUserRequest;
+import org.mihaimadan.wwi.users.model.dto.*;
 import org.mihaimadan.wwi.users.model.User;
-import org.mihaimadan.wwi.users.model.dto.PasswordTokenConfirmationRequest;
-import org.mihaimadan.wwi.users.model.dto.PasswordTokenInitializationRequest;
-import org.mihaimadan.wwi.users.model.dto.UserDTO;
 import org.mihaimadan.wwi.users.repository.UserRepository;
 import org.mihaimadan.wwi.users.service.UserService;
 import org.springframework.beans.BeanUtils;
@@ -52,16 +49,9 @@ public class UserController {
     @PostMapping("/users")
     public void registerUser(@RequestBody CreateUserRequest createUserReq) { userService.registerUser(createUserReq); }
 
-    @PutMapping("/users/{userId}")
-    public UserDTO updateUser(@RequestBody UserDTO userDTO, @PathVariable Long userId) {
-        User userToBeUpdated = userRepository.findById(userId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "no user found with given email"));
-        String newPassword = userDTO.getPassword();
-        userToBeUpdated.setPassword(passwordEncoder.encode(newPassword));
-        BeanUtils.copyProperties(userDTO, userToBeUpdated, "password");
-        userRepository.save(userToBeUpdated);
-        BeanUtils.copyProperties(userToBeUpdated, userDTO);
-        return userDTO;
+    @PutMapping("/users/{id}")
+    public void updateUser(@PathVariable Long id, @RequestBody EditUserRequest editUserRequest) {
+        userService.editUserData(id, editUserRequest);
     }
 
 }

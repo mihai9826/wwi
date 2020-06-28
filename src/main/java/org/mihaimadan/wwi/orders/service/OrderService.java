@@ -7,6 +7,8 @@ import org.mihaimadan.wwi.orders.repository.OrderRepository;
 import org.mihaimadan.wwi.orders.service.event.OrderStatusChangedEvent;
 import org.mihaimadan.wwi.users.model.User;
 import org.mihaimadan.wwi.users.service.UserService;
+import org.mihaimadan.wwi.warehouse.model.StockItem;
+import org.mihaimadan.wwi.warehouse.repository.StockItemRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.context.ApplicationEventPublisher;
@@ -14,8 +16,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.server.ResponseStatusException;
+
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -26,22 +28,33 @@ import java.util.List;
 public class OrderService {
     private final ApplicationEventPublisher eventPublisher;
     private final OrderRepository orderRepository;
+    private final StockItemRepository stockItemRepository;
     private final UserService userService;
     private final ModelMapper modelMapper;
 
+
     public OrderService(ApplicationEventPublisher eventPublisher, OrderRepository orderRepository,
-                        UserService userService, ModelMapper modelMapper) {
+                        StockItemRepository stockItemRepository, UserService userService, ModelMapper modelMapper) {
         this.eventPublisher = eventPublisher;
         this.orderRepository = orderRepository;
+        this.stockItemRepository = stockItemRepository;
         this.userService = userService;
         this.modelMapper = modelMapper;
     }
 
-    public void createNewOrder(@RequestBody OrderRequestDTO orderRequest) {
+    public void createNewOrder(OrderRequestDTO orderRequest) {
         Order newOrder = new Order();
 
         orderRequest.getOrderLines().forEach(it -> {
             OrderLine orderLine = modelMapper.map(it, OrderLine.class);
+            StockItem item = stockItemRepository.findById(orderLine.getStockItem().getStockItemId())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "item not found"));
+
+            int newStockItemQuantity = item.getStockItemHoldings()
+                    .getQuantityOnHand() - orderLine.getQuantity();
+            item.getStockItemHoldings().setQuantityOnHand(newStockItemQuantity);
+            
+            orderLine.setStockItem(item);
             newOrder.addOrderLine(orderLine);
         });
 
@@ -51,7 +64,7 @@ public class OrderService {
 
         newOrder.setContactPerson(contactPerson);
 
-        orderRepository.save(newOrder);//80000 last id
+        orderRepository.save(newOrder);
     }
 
     public Order getOrderByIdForAdmin(Long id) {
