@@ -4,11 +4,15 @@ import org.mihaimadan.wwi.users.model.dto.*;
 import org.mihaimadan.wwi.users.model.User;
 import org.mihaimadan.wwi.users.repository.UserRepository;
 import org.mihaimadan.wwi.users.service.UserService;
+import org.mihaimadan.wwi.warehouse.model.StockItem;
+import org.mihaimadan.wwi.warehouse.model.dto.StockItemClientRespDTO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.util.List;
 
 @RestController
 public class UserController {
@@ -54,4 +58,18 @@ public class UserController {
         userService.editUserData(id, editUserRequest);
     }
 
+    @GetMapping("/client/users/{id}/favorites")
+    public List<StockItemClientRespDTO> getFavoritesOfUser(@PathVariable Long id) {
+        return userService.getFavoritesOfUser(id);
+    }
+
+    @PutMapping("/client/users/{id}/favorites")
+    public void updateUserFavorites(@PathVariable Long id, @RequestBody Long itemId) {
+        userService.updateUserFavorites(id, itemId);
+    }
+
+    @DeleteMapping("/client/users/{id}/favorites/{itemId}")
+    public void deleteUserFavorite(@PathVariable Long id, @PathVariable Long itemId) {
+        userService.deleteUserFavorites(id, itemId);
+    }
 }
