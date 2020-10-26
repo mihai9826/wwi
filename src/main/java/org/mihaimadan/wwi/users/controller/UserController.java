@@ -66,4 +66,9 @@ public class UserController {
     public void updateUserFavorites(@PathVariable Long id, @RequestBody Long itemId) {
         userService.updateUserFavorites(id, itemId);
     }
+
+    @DeleteMapping("/users/{id}/favorites")
+    public void deleteUserFavorite(@PathVariable Long id, @RequestBody Long itemId) {
+        userService.deleteUserFavorites(id, itemId);
+    }
 }

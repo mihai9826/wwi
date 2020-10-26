@@ -138,4 +138,18 @@ public class UserService {
 
         return theUser.getFavoriteItems().stream().map(Favorites::getStockItem).collect(Collectors.toList());
     }
+
+    public void deleteUserFavorites(Long userId, Long itemId) {
+        User theUser = userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User with id doesn't exist"));
+
+        Favorites deleteFavorite = theUser.getFavoriteItems().stream()
+                .filter(x -> x.getStockItem().getStockItemId() == itemId).findAny()
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No favourite item found " +
+                        "with given item id"));
+
+        theUser.removeFavorite(deleteFavorite);
+
+        userRepository.save(theUser);
+    }
 }
