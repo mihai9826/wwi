@@ -9,7 +9,9 @@ import org.mihaimadan.wwi.users.repository.PasswordTokenRepository;
 import org.mihaimadan.wwi.users.repository.UserRepository;
 import org.mihaimadan.wwi.users.service.event.PasswordResetCompleteEvent;
 import org.mihaimadan.wwi.warehouse.model.StockItem;
+import org.mihaimadan.wwi.warehouse.model.dto.StockItemClientRespDTO;
 import org.mihaimadan.wwi.warehouse.repository.StockItemRepository;
+import org.mihaimadan.wwi.warehouse.service.StockItemService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
@@ -26,16 +28,19 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final StockItemRepository stockItemRepository;
+    private final StockItemService stockItemService;
     private final PasswordTokenRepository passwordTokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final ApplicationEventPublisher eventPublisher;
 
     public UserService(PasswordEncoder passwordEncoder, StockItemRepository stockItemRepository,
                        UserRepository userRepository,
+                       StockItemService stockItemService,
                        PasswordTokenRepository passwordTokenRepository,
                        ApplicationEventPublisher eventPublisher) {
         this.passwordEncoder = passwordEncoder;
         this.userRepository = userRepository;
+        this.stockItemService = stockItemService;
         this.stockItemRepository = stockItemRepository;
         this.passwordTokenRepository = passwordTokenRepository;
         this.eventPublisher = eventPublisher;
@@ -132,11 +137,12 @@ public class UserService {
         }
     }
 
-    public List<StockItem> getFavoritesOfUser(Long itemId) {
+    public List<StockItemClientRespDTO> getFavoritesOfUser(Long itemId) {
         User theUser = userRepository.findById(itemId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User with id doesn't exist"));
 
-        return theUser.getFavoriteItems().stream().map(Favorites::getStockItem).collect(Collectors.toList());
+        return theUser.getFavoriteItems().stream().map(Favorites::getStockItem)
+                .map(stockItemService::convertToDto).collect(Collectors.toList());
     }
 
     public void deleteUserFavorites(Long userId, Long itemId) {

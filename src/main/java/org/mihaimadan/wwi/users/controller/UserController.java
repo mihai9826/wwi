@@ -5,6 +5,7 @@ import org.mihaimadan.wwi.users.model.User;
 import org.mihaimadan.wwi.users.repository.UserRepository;
 import org.mihaimadan.wwi.users.service.UserService;
 import org.mihaimadan.wwi.warehouse.model.StockItem;
+import org.mihaimadan.wwi.warehouse.model.dto.StockItemClientRespDTO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -57,18 +58,18 @@ public class UserController {
         userService.editUserData(id, editUserRequest);
     }
 
-    @GetMapping("/users/{id}/favorites")
-    public List<StockItem> getFavoritesOfUser(@PathVariable Long id) {
+    @GetMapping("/client/users/{id}/favorites")
+    public List<StockItemClientRespDTO> getFavoritesOfUser(@PathVariable Long id) {
         return userService.getFavoritesOfUser(id);
     }
 
-    @PutMapping("/users/{id}/favorites")
+    @PutMapping("/client/users/{id}/favorites")
     public void updateUserFavorites(@PathVariable Long id, @RequestBody Long itemId) {
         userService.updateUserFavorites(id, itemId);
     }
 
-    @DeleteMapping("/users/{id}/favorites")
-    public void deleteUserFavorite(@PathVariable Long id, @RequestBody Long itemId) {
+    @DeleteMapping("/client/users/{id}/favorites/{itemId}")
+    public void deleteUserFavorite(@PathVariable Long id, @PathVariable Long itemId) {
         userService.deleteUserFavorites(id, itemId);
     }
 }

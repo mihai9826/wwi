@@ -95,7 +95,7 @@ public class StockItemService {
         return new PageImpl<>(stockItemsDTO.subList(start, end), PageRequest.of(page, size), stockItemsDTO.size());
     }
 
-    private StockItemClientRespDTO convertToDto(StockItem stockItem) {
+    public StockItemClientRespDTO convertToDto(StockItem stockItem) {
         StockItemClientRespDTO stockItemClientRespDTO = modelMapper.map(stockItem, StockItemClientRespDTO.class);
         int stockItemQuantity = stockItem.getStockItemHoldings().getQuantityOnHand();
         stockItemClientRespDTO.setSoldOut(stockItemQuantity < 1);
