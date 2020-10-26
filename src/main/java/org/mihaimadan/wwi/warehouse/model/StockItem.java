@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.mihaimadan.wwi.users.model.Favorites;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -50,5 +51,9 @@ public class StockItem {
     @JsonIgnore
     @OneToMany(mappedBy = "stockItem")
     private List<StockItemStockGroup> stockGroups = new ArrayList<>();
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "stockItem")
+    private List<Favorites> usersFavorites = new ArrayList<>();
 
 }

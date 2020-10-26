@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -33,6 +35,9 @@ public class User {
     @NotNull
     private String password;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Favorites> favoriteItems = new ArrayList<>();
+
     private boolean isClient;
 
     private boolean isAdmin;
@@ -44,5 +49,15 @@ public class User {
 
     public String getRole() {
         return this.isAdmin ? "ADMIN" : "CLIENT";
+    }
+
+    public void addFavorite(Favorites favorite) {
+        favoriteItems.add(favorite);
+        favorite.setUser(this);
+    }
+
+    public void removeFavorite(Favorites favorite) {
+        favoriteItems.remove(favorite);
+        favorite.setUser(null);
     }
 }

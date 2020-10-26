@@ -1,5 +1,6 @@
 package org.mihaimadan.wwi.users.service;
 
+import org.mihaimadan.wwi.users.model.Favorites;
 import org.mihaimadan.wwi.users.model.PasswordToken;
 import org.mihaimadan.wwi.users.model.dto.CreateUserRequest;
 import org.mihaimadan.wwi.users.model.User;
@@ -7,6 +8,8 @@ import org.mihaimadan.wwi.users.model.dto.EditUserRequest;
 import org.mihaimadan.wwi.users.repository.PasswordTokenRepository;
 import org.mihaimadan.wwi.users.repository.UserRepository;
 import org.mihaimadan.wwi.users.service.event.PasswordResetCompleteEvent;
+import org.mihaimadan.wwi.warehouse.model.StockItem;
+import org.mihaimadan.wwi.warehouse.repository.StockItemRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
@@ -14,21 +17,26 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
 
     private final UserRepository userRepository;
+    private final StockItemRepository stockItemRepository;
     private final PasswordTokenRepository passwordTokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final ApplicationEventPublisher eventPublisher;
 
-    public UserService(PasswordEncoder passwordEncoder, UserRepository userRepository,
+    public UserService(PasswordEncoder passwordEncoder, StockItemRepository stockItemRepository,
+                       UserRepository userRepository,
                        PasswordTokenRepository passwordTokenRepository,
                        ApplicationEventPublisher eventPublisher) {
         this.passwordEncoder = passwordEncoder;
         this.userRepository = userRepository;
+        this.stockItemRepository = stockItemRepository;
         this.passwordTokenRepository = passwordTokenRepository;
         this.eventPublisher = eventPublisher;
     }
@@ -93,5 +101,41 @@ public class UserService {
 
         userRepository.save(userToBeUpdated);
         passwordTokenRepository.delete(passwordToken);
+    }
+
+    public void updateUserFavorites(Long userId, Long itemId) {
+        User userToBeUpdated = userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No user found with given id"));
+
+        StockItem itemToAdd = stockItemRepository.findById(itemId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No item found with given id"));
+
+        //check if the item is already added to favorites
+        if (userToBeUpdated.getFavoriteItems().isEmpty()) {
+            Favorites newFavorite = new Favorites();
+            newFavorite.setStockItem(itemToAdd);
+            userToBeUpdated.addFavorite(newFavorite);
+            userRepository.save(userToBeUpdated);
+            return;
+        }
+
+        boolean itemExists = userToBeUpdated.getFavoriteItems().stream().anyMatch(obj ->
+                obj.getStockItem().getStockItemId() == itemToAdd.getStockItemId());
+
+        if (!itemExists) {
+            Favorites newFavorite = new Favorites();
+            newFavorite.setStockItem(itemToAdd);
+            userToBeUpdated.addFavorite(newFavorite);
+            userRepository.save(userToBeUpdated);
+        } else {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Duplicate favorite entries");
+        }
+    }
+
+    public List<StockItem> getFavoritesOfUser(Long itemId) {
+        User theUser = userRepository.findById(itemId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User with id doesn't exist"));
+
+        return theUser.getFavoriteItems().stream().map(Favorites::getStockItem).collect(Collectors.toList());
     }
 }
