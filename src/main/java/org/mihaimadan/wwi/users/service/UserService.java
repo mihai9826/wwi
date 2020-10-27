@@ -5,6 +5,7 @@ import org.mihaimadan.wwi.users.model.PasswordToken;
 import org.mihaimadan.wwi.users.model.dto.CreateUserRequest;
 import org.mihaimadan.wwi.users.model.User;
 import org.mihaimadan.wwi.users.model.dto.EditUserRequest;
+import org.mihaimadan.wwi.users.model.dto.UserDTO;
 import org.mihaimadan.wwi.users.repository.PasswordTokenRepository;
 import org.mihaimadan.wwi.users.repository.UserRepository;
 import org.mihaimadan.wwi.users.service.event.PasswordResetCompleteEvent;
@@ -12,8 +13,11 @@ import org.mihaimadan.wwi.warehouse.model.StockItem;
 import org.mihaimadan.wwi.warehouse.model.dto.StockItemClientRespDTO;
 import org.mihaimadan.wwi.warehouse.repository.StockItemRepository;
 import org.mihaimadan.wwi.warehouse.service.StockItemService;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -32,18 +36,21 @@ public class UserService {
     private final PasswordTokenRepository passwordTokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final ApplicationEventPublisher eventPublisher;
+    private final ModelMapper modelMapper;
 
     public UserService(PasswordEncoder passwordEncoder, StockItemRepository stockItemRepository,
                        UserRepository userRepository,
                        StockItemService stockItemService,
                        PasswordTokenRepository passwordTokenRepository,
-                       ApplicationEventPublisher eventPublisher) {
+                       ApplicationEventPublisher eventPublisher,
+                       ModelMapper modelMapper) {
         this.passwordEncoder = passwordEncoder;
         this.userRepository = userRepository;
         this.stockItemService = stockItemService;
         this.stockItemRepository = stockItemRepository;
         this.passwordTokenRepository = passwordTokenRepository;
         this.eventPublisher = eventPublisher;
+        this.modelMapper = modelMapper;
     }
 
     public User getById(Long id) {
@@ -65,6 +72,11 @@ public class UserService {
         userRepository.save(newUser);
     }
 
+    public Page<UserDTO> getAllUsersForAdmin(int page, int size) {
+        return userRepository.findAll(PageRequest.of(page, size))
+                .map(el -> modelMapper.map(el, UserDTO.class));
+    }
+
     public void editUserData(Long id, EditUserRequest editUserRequest) {
         User userToBeUpdated = userRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "user with given id not found"));
@@ -73,6 +85,26 @@ public class UserService {
 
         String newPassword = editUserRequest.getPassword();
         userToBeUpdated.setPassword(passwordEncoder.encode(newPassword));
+
+        userRepository.save(userToBeUpdated);
+    }
+
+    public void deleteUser(Long userId) {
+        User userToDelete = userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User with given id not found"));
+
+        userRepository.delete(userToDelete);
+    }
+
+    public void adminUpdateUserRole(Long userId, String newRole) {
+        User userToBeUpdated = userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User with given id not found"));
+
+        userToBeUpdated.setRole(newRole);
+
+        if (userToBeUpdated.getPassword() == null) {
+            userToBeUpdated.setPassword(passwordEncoder.encode("12345")); //for WWI sample database already registered users
+        }
 
         userRepository.save(userToBeUpdated);
     }
@@ -158,4 +190,7 @@ public class UserService {
 
         userRepository.save(theUser);
     }
+
+
+
 }
