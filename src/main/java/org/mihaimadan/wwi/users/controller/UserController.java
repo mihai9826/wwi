@@ -4,11 +4,10 @@ import org.mihaimadan.wwi.users.model.dto.*;
 import org.mihaimadan.wwi.users.model.User;
 import org.mihaimadan.wwi.users.repository.UserRepository;
 import org.mihaimadan.wwi.users.service.UserService;
-import org.mihaimadan.wwi.warehouse.model.StockItem;
 import org.mihaimadan.wwi.warehouse.model.dto.StockItemClientRespDTO;
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -19,13 +18,11 @@ public class UserController {
 
     private final UserRepository userRepository;
     private final UserService userService;
-    private final PasswordEncoder passwordEncoder;
 
 
-    public UserController(UserRepository userRepository, UserService userService, PasswordEncoder passwordEncoder) {
+    public UserController(UserRepository userRepository, UserService userService) {
         this.userRepository = userRepository;
         this.userService = userService;
-        this.passwordEncoder = passwordEncoder;
     }
 
     @PostMapping("/password-token")
@@ -37,6 +34,22 @@ public class UserController {
     public void confirmPasswordReset(@RequestParam String token,
                                      @RequestBody PasswordTokenConfirmationRequest passwordTokenConfirmationRequest) {
         userService.updateUserPassword(token, passwordTokenConfirmationRequest.getPassword());
+    }
+
+    @GetMapping("/admin/users")
+    public Page<UserDTO> getAllUsersForAdmin(@RequestParam int page, @RequestParam int size) {
+        return userService.getAllUsersForAdmin(page, size);
+    }
+
+    @DeleteMapping("/admin/users/{id}")
+    public void deleteUser(@PathVariable Long id) {
+        userService.deleteUser(id);
+    }
+
+    @PutMapping("/admin/users/{id}")
+    public void adminUpdateUserRole(@PathVariable Long id, @RequestBody String newRole) {
+        userService.adminUpdateUserRole(id, newRole);
+
     }
 
 
@@ -57,6 +70,7 @@ public class UserController {
     public void updateUser(@PathVariable Long id, @RequestBody EditUserRequest editUserRequest) {
         userService.editUserData(id, editUserRequest);
     }
+
 
     @GetMapping("/client/users/{id}/favorites")
     public List<StockItemClientRespDTO> getFavoritesOfUser(@PathVariable Long id) {
